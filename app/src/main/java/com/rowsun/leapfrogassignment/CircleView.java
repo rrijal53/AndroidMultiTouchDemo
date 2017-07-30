@@ -18,13 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Created by rowsun on 7/300/17.
+ * Created by rowsun on 7/30/17.
  */
 
 public class CircleView extends View {
     private Paint paint;
-    Canvas canvas;
-    private Rect mMeasuredRect;
     private List<Circle> mCircles = new ArrayList<Circle>();
     private SparseArray<Circle> mCirclePointer = new SparseArray<Circle>();
 
@@ -125,20 +123,9 @@ public class CircleView extends View {
 
 
     private Circle addCircle(final int xTouch, final int yTouch) {
-
         Circle touchedCircle = new Circle(xTouch, yTouch);
         mCircles.add(touchedCircle);
-
-
         return touchedCircle;
-    }
-
-
-    @Override
-    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        mMeasuredRect = new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight());
     }
 
     private void clearAllCircle() {
@@ -148,6 +135,5 @@ public class CircleView extends View {
 
     private void removeCircle(Circle c) {
         mCircles.remove(c);
-        invalidate();
     }
 }
