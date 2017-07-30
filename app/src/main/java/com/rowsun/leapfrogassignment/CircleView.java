@@ -24,16 +24,17 @@ import java.util.List;
 public class CircleView extends View {
     private Paint paint;
     Canvas canvas;
-    private List<Circle> mCircles = new ArrayList<>();
-    private List<Circle> mCirclePointer = new ArrayList<>();
+    private Rect mMeasuredRect;
+    private List<Circle> mCircles = new ArrayList<Circle>();
+    private SparseArray<Circle> mCirclePointer = new SparseArray<Circle>();
 
     public CircleView(Context context) {
         super(context);
 
-        initialize(context);
+        initialize();
     }
 
-    private void initialize(Context context) {
+    private void initialize() {
         paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL);
@@ -60,7 +61,6 @@ public class CircleView extends View {
 //            canvas.restore();
 //        }
 //        return false;
-        boolean handled = false;
 
         Circle touchedCircle;
         int xTouch;
@@ -78,10 +78,9 @@ public class CircleView extends View {
                 touchedCircle = obtainTouchedCircle(xTouch, yTouch);
                 touchedCircle.centerX = xTouch;
                 touchedCircle.centerY = yTouch;
-                mCirclePointer.add(event.getPointerId(0), touchedCircle);
+                mCirclePointer.put(event.getPointerId(0), touchedCircle);
 
                 invalidate();
-                handled = true;
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -93,11 +92,10 @@ public class CircleView extends View {
 
                 touchedCircle = obtainTouchedCircle(xTouch, yTouch);
 
-                mCirclePointer.add(pointerId, touchedCircle);
+                mCirclePointer.put(pointerId, touchedCircle);
                 touchedCircle.centerX = xTouch;
                 touchedCircle.centerY = yTouch;
                 invalidate();
-                handled = true;
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -118,33 +116,35 @@ public class CircleView extends View {
                     }
                 }
                 invalidate();
-                handled = true;
                 break;
 
             case MotionEvent.ACTION_UP:
                 clearCirclePointer();
                 invalidate();
-                handled = true;
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
                 pointerId = event.getPointerId(actionIndex);
 
                 mCirclePointer.remove(pointerId);
-                removeCircle(mCircles.get(pointerId));
+                xTouch = (int) event.getX(actionIndex);
+                yTouch = (int) event.getY(actionIndex);
+
+                Circle removedCircle = obtainTouchedCircle(xTouch, yTouch);
+
+                removeCircle(removedCircle);
                 invalidate();
-                handled = true;
                 break;
 
             case MotionEvent.ACTION_CANCEL:
-                handled = true;
                 break;
 
             default:
-                break;
+                return super.onTouchEvent(event);
+
         }
 
-        return super.onTouchEvent(event) || handled;
+        return true;
 
     }
 
@@ -178,7 +178,7 @@ public class CircleView extends View {
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        Rect mMeasuredRect = new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        mMeasuredRect = new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight());
     }
 
     private void clearCirclePointer() {
