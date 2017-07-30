@@ -50,18 +50,6 @@ public class CircleView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//            if (surfaceHolder.getSurface().isValid()) {
-//                canvas.drawColor(Color.BLACK);
-//                canvas.drawCircle(event.getX(), event.getY(), 50, paint);
-//                surfaceHolder.unlockCanvasAndPost(canvas);
-//            }
-//
-//        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-//            canvas.restore();
-//        }
-//        return false;
-
         Circle touchedCircle;
         int xTouch;
         int yTouch;
@@ -70,31 +58,24 @@ public class CircleView extends View {
 
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                clearCirclePointer();
-
+                clearAllCircle();
                 xTouch = (int) event.getX(0);
                 yTouch = (int) event.getY(0);
 
-                touchedCircle = obtainTouchedCircle(xTouch, yTouch);
-                touchedCircle.centerX = xTouch;
-                touchedCircle.centerY = yTouch;
+                touchedCircle = addCircle(xTouch, yTouch);
                 mCirclePointer.put(event.getPointerId(0), touchedCircle);
-
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
 
                 pointerId = event.getPointerId(actionIndex);
-
                 xTouch = (int) event.getX(actionIndex);
                 yTouch = (int) event.getY(actionIndex);
 
-                touchedCircle = obtainTouchedCircle(xTouch, yTouch);
-
+                touchedCircle = addCircle(xTouch, yTouch);
                 mCirclePointer.put(pointerId, touchedCircle);
-                touchedCircle.centerX = xTouch;
-                touchedCircle.centerY = yTouch;
+
                 invalidate();
                 break;
 
@@ -109,7 +90,6 @@ public class CircleView extends View {
                     yTouch = (int) event.getY(actionIndex);
 
                     touchedCircle = mCirclePointer.get(pointerId);
-
                     if (null != touchedCircle) {
                         touchedCircle.centerX = xTouch;
                         touchedCircle.centerY = yTouch;
@@ -119,20 +99,15 @@ public class CircleView extends View {
                 break;
 
             case MotionEvent.ACTION_UP:
-                clearCirclePointer();
+                clearAllCircle();
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
                 pointerId = event.getPointerId(actionIndex);
-
+                Circle removed = mCirclePointer.get(pointerId);
                 mCirclePointer.remove(pointerId);
-                xTouch = (int) event.getX(actionIndex);
-                yTouch = (int) event.getY(actionIndex);
-
-                Circle removedCircle = obtainTouchedCircle(xTouch, yTouch);
-
-                removeCircle(removedCircle);
+                removeCircle(removed);
                 invalidate();
                 break;
 
@@ -149,30 +124,15 @@ public class CircleView extends View {
     }
 
 
-    private Circle obtainTouchedCircle(final int xTouch, final int yTouch) {
-        Circle touchedCircle = getTouchedCircle(xTouch, yTouch);
+    private Circle addCircle(final int xTouch, final int yTouch) {
 
-        if (null == touchedCircle) {
-            touchedCircle = new Circle(xTouch, yTouch);
-            mCircles.add(touchedCircle);
-        }
+        Circle touchedCircle = new Circle(xTouch, yTouch);
+        mCircles.add(touchedCircle);
+
 
         return touchedCircle;
     }
 
-
-    private Circle getTouchedCircle(final int xTouch, final int yTouch) {
-        Circle touched = null;
-
-        for (Circle circle : mCircles) {
-            if ((circle.centerX - xTouch) * (circle.centerX - xTouch) + (circle.centerY - yTouch) * (circle.centerY - yTouch) <= 300 * 300) {
-                touched = circle;
-                break;
-            }
-        }
-
-        return touched;
-    }
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
@@ -181,7 +141,7 @@ public class CircleView extends View {
         mMeasuredRect = new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight());
     }
 
-    private void clearCirclePointer() {
+    private void clearAllCircle() {
         mCirclePointer.clear();
         mCircles.clear();
     }

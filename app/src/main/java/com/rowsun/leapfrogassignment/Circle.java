@@ -13,5 +13,4 @@ public class Circle {
         this.centerY = centerY;
     }
 
-
 }
