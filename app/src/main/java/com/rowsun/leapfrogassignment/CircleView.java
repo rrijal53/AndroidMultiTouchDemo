@@ -1,20 +1,14 @@
 package com.rowsun.leapfrogassignment;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.SparseArray;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
